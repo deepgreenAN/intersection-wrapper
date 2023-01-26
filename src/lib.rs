@@ -1,5 +1,37 @@
+use js_sys::Array;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::{Element, IntersectionObserver, IntersectionObserverEntry, IntersectionObserverInit};
+
+/// The wrapper of IntersectionObserverInit
+pub struct IntersectionObserverOptions {
+    init: IntersectionObserverInit,
+}
+
+#[allow(clippy::new_without_default)]
+impl IntersectionObserverOptions {
+    /// Constructor of this options
+    pub fn new() -> Self {
+        Self {
+            init: IntersectionObserverInit::new(),
+        }
+    }
+    /// IntersectionObserverInit::root
+    pub fn root(&mut self, val: Option<&Element>) -> &mut Self {
+        self.init.root(val);
+        self
+    }
+    /// IntersectionObserverInit::root_margin
+    pub fn root_margin(&mut self, val: &str) -> &mut Self {
+        self.init.root_margin(val);
+        self
+    }
+    /// IntersectionObserverInit::threshold
+    pub fn threshold(&mut self, val: &[f64]) -> &mut Self {
+        let array = val.iter().map(|x| JsValue::from_f64(*x)).collect::<Array>();
+        self.init.threshold(array.as_ref());
+        self
+    }
+}
 
 /// The wrapper of IntersectionObserver and the handler of js closure.
 #[allow(clippy::type_complexity)]
@@ -25,12 +57,14 @@ impl IntersectionObserverHandler {
     /// Constructor with options.
     pub fn new_with_options<F: FnMut(&IntersectionObserverEntry) + 'static>(
         callback: F,
-        options: &IntersectionObserverInit,
+        options: &IntersectionObserverOptions,
     ) -> Result<IntersectionObserverHandler, JsValue> {
         let callback =
             Closure::wrap(Box::new(callback) as Box<dyn FnMut(&IntersectionObserverEntry)>);
-        let observer =
-            IntersectionObserver::new_with_options(callback.as_ref().unchecked_ref(), options)?;
+        let observer = IntersectionObserver::new_with_options(
+            callback.as_ref().unchecked_ref(),
+            &options.init,
+        )?;
         Ok(Self {
             observer,
             _callback: Some(callback),
