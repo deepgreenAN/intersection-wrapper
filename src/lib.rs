@@ -3,6 +3,7 @@ use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::{Element, IntersectionObserver, IntersectionObserverEntry, IntersectionObserverInit};
 
 /// The wrapper of IntersectionObserverInit
+#[derive(Clone)]
 pub struct IntersectionObserverOptions {
     init: IntersectionObserverInit,
 }
@@ -16,20 +17,53 @@ impl IntersectionObserverOptions {
         }
     }
     /// IntersectionObserverInit::root
-    pub fn root(&mut self, val: Option<&Element>) -> &mut Self {
+    pub fn root(&mut self, val: Option<&Element>) {
         self.init.root(val);
-        self
     }
     /// IntersectionObserverInit::root_margin
-    pub fn root_margin(&mut self, val: &str) -> &mut Self {
+    pub fn root_margin(&mut self, val: &str) {
         self.init.root_margin(val);
-        self
     }
     /// IntersectionObserverInit::threshold
-    pub fn threshold(&mut self, val: &[f64]) -> &mut Self {
+    pub fn threshold(&mut self, val: &[f64]) {
         let array = val.iter().map(|x| JsValue::from_f64(*x)).collect::<Array>();
         self.init.threshold(array.as_ref());
+    }
+    /// Make builder.
+    pub fn builder() -> IntersectionObserverOptionsBuilder {
+        IntersectionObserverOptionsBuilder::new()
+    }
+}
+
+pub struct IntersectionObserverOptionsBuilder {
+    options: IntersectionObserverOptions,
+}
+
+#[allow(clippy::new_without_default)]
+impl IntersectionObserverOptionsBuilder {
+    pub fn new() -> Self {
+        Self {
+            options: IntersectionObserverOptions::new(),
+        }
+    }
+    /// set root
+    pub fn root(&mut self, val: Option<&Element>) -> &mut Self {
+        self.options.root(val);
         self
+    }
+    /// set root_margin
+    pub fn root_margin(&mut self, val: &str) -> &mut Self {
+        self.options.root_margin(val);
+        self
+    }
+    /// set threshold
+    pub fn threshold(&mut self, val: &[f64]) -> &mut Self {
+        self.options.threshold(val);
+        self
+    }
+    /// Build options type.
+    pub fn build(&mut self) -> IntersectionObserverOptions {
+        self.options.clone()
     }
 }
 
