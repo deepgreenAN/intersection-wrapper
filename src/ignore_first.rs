@@ -37,7 +37,7 @@ impl IgnoreOnce for IntersectionObserverHandler {
         let observer = IntersectionObserver::new(closure.as_ref().unchecked_ref())?;
         Ok(Self {
             observer,
-            callback: Some(closure),
+            _callback: Some(closure),
         })
     }
     fn new_ignore_once_with_options<
@@ -63,7 +63,7 @@ impl IgnoreOnce for IntersectionObserverHandler {
         )?;
         Ok(Self {
             observer,
-            callback: Some(closure),
+            _callback: Some(closure),
         })
     }
 }

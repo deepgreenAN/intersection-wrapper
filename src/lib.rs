@@ -75,7 +75,7 @@ impl IntersectionObserverOptionsBuilder {
 #[derive(Debug)]
 pub struct IntersectionObserverHandler {
     observer: IntersectionObserver,
-    callback: Option<Closure<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>>,
+    _callback: Option<Closure<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>>,
     // The flag whether intersection observer api has fired once or not.
 }
 
@@ -95,7 +95,7 @@ impl IntersectionObserverHandler {
         let observer = IntersectionObserver::new(closure.as_ref().unchecked_ref())?;
         Ok(Self {
             observer,
-            callback: Some(closure),
+            _callback: Some(closure),
         })
     }
     /// Constructor with options.
@@ -117,7 +117,7 @@ impl IntersectionObserverHandler {
         )?;
         Ok(Self {
             observer,
-            callback: Some(closure),
+            _callback: Some(closure),
         })
     }
     /// IntersectionObserver::root
