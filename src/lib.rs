@@ -1,3 +1,6 @@
+mod ignore_first;
+pub use ignore_first::IgnoreOnce;
+
 use js_sys::Array;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::{Element, IntersectionObserver, IntersectionObserverEntry, IntersectionObserverInit};
@@ -72,36 +75,49 @@ impl IntersectionObserverOptionsBuilder {
 #[derive(Debug)]
 pub struct IntersectionObserverHandler {
     observer: IntersectionObserver,
-    _callback: Option<Closure<dyn FnMut(&IntersectionObserverEntry)>>,
+    _callback: Option<Closure<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>>,
+    // The flag whether intersection observer api has fired once or not.
 }
 
 impl IntersectionObserverHandler {
     /// Constructor of this handler.
-    pub fn new<F: FnMut(&IntersectionObserverEntry) + 'static>(
-        callback: F,
+    pub fn new<F: FnMut(Vec<&IntersectionObserverEntry>, &IntersectionObserver) + 'static>(
+        mut callback: F,
     ) -> Result<IntersectionObserverHandler, JsValue> {
-        let callback =
-            Closure::wrap(Box::new(callback) as Box<dyn FnMut(&IntersectionObserverEntry)>);
-        let observer = IntersectionObserver::new(callback.as_ref().unchecked_ref())?;
+        // 引数を参照にするためのラッパー
+        let callback_wrapper =
+            move |entries: Vec<IntersectionObserverEntry>, observer: IntersectionObserver| {
+                callback(entries.iter().collect(), &observer)
+            };
+        // Jsクロージャ．
+        let closure = Closure::wrap(Box::new(callback_wrapper)
+            as Box<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>);
+        let observer = IntersectionObserver::new(closure.as_ref().unchecked_ref())?;
         Ok(Self {
             observer,
-            _callback: Some(callback),
+            _callback: Some(closure),
         })
     }
     /// Constructor with options.
-    pub fn new_with_options<F: FnMut(&IntersectionObserverEntry) + 'static>(
-        callback: F,
+    pub fn new_with_options<
+        F: FnMut(Vec<&IntersectionObserverEntry>, &IntersectionObserver) + 'static,
+    >(
+        mut callback: F,
         options: &IntersectionObserverOptions,
     ) -> Result<IntersectionObserverHandler, JsValue> {
-        let callback =
-            Closure::wrap(Box::new(callback) as Box<dyn FnMut(&IntersectionObserverEntry)>);
+        let callback_wrapper =
+            move |entries: Vec<IntersectionObserverEntry>, observer: IntersectionObserver| {
+                callback(entries.iter().collect(), &observer)
+            };
+        let closure = Closure::wrap(Box::new(callback_wrapper)
+            as Box<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>);
         let observer = IntersectionObserver::new_with_options(
-            callback.as_ref().unchecked_ref(),
+            closure.as_ref().unchecked_ref(),
             &options.init,
         )?;
         Ok(Self {
             observer,
-            _callback: Some(callback),
+            _callback: Some(closure),
         })
     }
     /// IntersectionObserver::root
