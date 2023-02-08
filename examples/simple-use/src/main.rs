@@ -9,7 +9,8 @@ fn main() {
         move |entries, _| {
             entries.into_iter().for_each(|entry| {
                 let id = entry.target().id();
-                log::info!("intersecting with #{id}.");
+                let is_intersecting = entry.is_intersecting();
+                log::info!("intersecting with #{id}. IsIntersecting: {is_intersecting}");
             });
         },
         &IntersectionObserverOptions::builder()
