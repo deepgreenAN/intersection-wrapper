@@ -5,10 +5,14 @@ use std::rc::Rc;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::IntersectionObserverEntry;
 
+/// The extension to ignore the first fire of intersection(the firing is probably when it is loaded).
 pub trait IgnoreOnce {
+    /// Constructor of Handler that ignore once.
     fn new_ignore_once<F: FnMut(Vec<&IntersectionObserverEntry>, &IntersectionObserver) + 'static>(
         callback: F,
     ) -> Result<IntersectionObserverHandler, JsValue>;
+
+    /// Constructor of Handler with options, which closure ignore once.
     fn new_ignore_once_with_options<
         F: FnMut(Vec<&IntersectionObserverEntry>, &IntersectionObserver) + 'static,
     >(
