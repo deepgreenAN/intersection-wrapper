@@ -2,7 +2,7 @@ mod ignore_first;
 pub use ignore_first::IgnoreOnce;
 
 use js_sys::Array;
-use wasm_bindgen::{prelude::*, JsCast};
+use wasm_bindgen::{prelude::*, JsCast, UnwrapThrowExt};
 use web_sys::{Element, IntersectionObserver, IntersectionObserverEntry, IntersectionObserverInit};
 
 /// The wrapper of IntersectionObserverInit
@@ -75,7 +75,7 @@ impl IntersectionObserverOptionsBuilder {
 #[derive(Debug)]
 pub struct IntersectionObserverHandler {
     observer: IntersectionObserver,
-    _callback: Option<Closure<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>>,
+    callback: Option<Closure<dyn FnMut(Vec<IntersectionObserverEntry>, IntersectionObserver)>>,
     // The flag whether intersection observer api has fired once or not.
 }
 
@@ -95,7 +95,7 @@ impl IntersectionObserverHandler {
         let observer = IntersectionObserver::new(closure.as_ref().unchecked_ref())?;
         Ok(Self {
             observer,
-            _callback: Some(closure),
+            callback: Some(closure),
         })
     }
     /// Constructor with options.
@@ -117,7 +117,7 @@ impl IntersectionObserverHandler {
         )?;
         Ok(Self {
             observer,
-            _callback: Some(closure),
+            callback: Some(closure),
         })
     }
     /// IntersectionObserver::root

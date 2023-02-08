@@ -1,3 +1,7 @@
 {
-    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "cSpell.userWords": [
+        "bindgen",
+        "unobserve"
+    ]
 }

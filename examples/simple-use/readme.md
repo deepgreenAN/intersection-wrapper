@@ -1,0 +1,4 @@
+# trunkのテンプレート
+```
+trunk serve --release
+```

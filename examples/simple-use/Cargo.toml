@@ -1,0 +1,24 @@
+[package]
+name = "trunk-simple-tamplate"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gloo-utils = "^0.1"
+gloo-intersection = { path = "../.." }
+log = "0.4.6"
+wasm-logger = "0.2.0"
+web-sys = { version = "^0.3", features = ["Document", "NodeList"] }
+wasm-bindgen = "0.2.83"
+
+[profile.release]
+# less code to include into binary
+panic = 'abort'
+# optimization over all codebase ( better optimization, slower build )
+codegen-units = 1
+# optimization for size ( more aggressive )
+opt-level = 'z'
+# link time optimization using using whole-program analysis
+lto = true
